@@ -2,6 +2,7 @@ from flask import Flask, request, redirect
 import cgi
 import os
 import jinja2
+import re
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir), autoescape=True)
@@ -9,24 +10,16 @@ jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir), aut
 app = Flask(__name__)
 app.config['DEBUG'] = True 
 
+
 def valid_username(username):
-    space = ' '
-    if space in username:
-        username_error = 'There is space in your username!'
-        return False
-    elif len(username)==0:
-        username_error = 'Username cannot be empty!'
+    while not re.match("^[A-Za-z0-9]+$", username):
+        username_error = 'Username error!'
         return False
     else:
         return True
 
 def valid_password(password):
-    space = ' '
-    if space in password:
-        password_error = 'There is space in your password!'
-        return False
-    elif len(password)>20 or len(password)<3:
-        password_error = 'Password is too long or too short!'
+    while not re.match("^[A-Za-z0-9]{4,19}$", password):
         return False
     else:
         return True
@@ -41,18 +34,10 @@ def valid_passwordconf(password, passwordconf):
         return True
 
 def valid_email(email):
-    space = ' '
     if len(email)==0:
       return True
     else:
-      if email.count('@')!=1 or email.count('.')!=1:
-          email_error = "Invalid email form!"
-          return False
-      elif space in email:
-          email_error = 'There is space in your email address!'
-          return False
-      elif len(email)>20 or len(email)<3:
-          email_error = 'email is too long or too short!'
+      while not re.match("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9]+\.[a-zA-Z0-9-.]+", email):
           return False
       else:
           return True
